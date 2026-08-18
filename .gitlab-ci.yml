@@ -5,4 +5,4 @@ test-runner:
   stage: test
   script:
     - echo "GitLab CI is working"
-    - echo "Testing deployment connectivity"
+    - echo "Testing deployment connectivity -" 
