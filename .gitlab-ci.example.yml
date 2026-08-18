@@ -1,0 +1,29 @@
+# DISCUSSION TEMPLATE ONLY
+#
+# Do not enable this pipeline until the infrastructure team confirms
+# the approved deployment mechanism and credentials.
+#
+# Example concept:
+#
+# stages:
+#   - build
+#   - deploy
+#
+# build_nextjs:
+#   stage: build
+#   image: node:22
+#   script:
+#     - cd nextjs
+#     - npm ci
+#     - npm run build
+#   artifacts:
+#     paths:
+#       - nextjs/out/
+#
+# deploy:
+#   stage: deploy
+#   script:
+#     # Replace with the company's approved deployment mechanism.
+#     # Example possibilities: SSH/SFTP, deployment API, or another
+#     # Webapplication Farm supported mechanism.
+#     - echo "Deployment mechanism must be confirmed by infrastructure."
