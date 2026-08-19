@@ -1,101 +1,119 @@
-# Webapplication Farm Deployment Demo
+Streamlit Web Application Farm Deployment Demo
 
-Proof-of-concept repository for investigating:
+Overview
+--------
+This repository is a proof-of-concept for deploying a Streamlit application on the Web Application Farm using GitLab CI/CD and Webmin.
 
-- Apache/Webapplication Farm hosting
-- A minimal Next.js "Hello World" application
-- Git/CI-based deployment
-- A Streamlit alternative using the custom commands available in the Webmin instance
-- Infrastructure blockers, especially permissions and remote deployment
+The goal is to investigate whether application changes can be deployed remotely without manually uploading files through the Webmin interface.
 
-## Important distinction
+Current Architecture
+--------------------
+GitLab Repository
+       |
+       | Git push
+       v
+GitLab CI/CD Pipeline
+       |
+       | Authenticate to Webmin
+       v
+Webmin
+       |
+       | Execute "Git Pull" custom command
+       v
+Streamlit application directory
+       |
+       v
+Streamlit application
 
-Streamlit is useful for testing whether the Webapplication Farm can pull code from Git and start an application remotely, but it does **not** replace the original Next.js/Apache requirement.
+CI/CD Deployment
+----------------
+The current proof of concept uses GitLab CI/CD to remotely trigger the existing Webmin deployment command.
 
-The original ticket should therefore be tested in two tracks:
+The pipeline performs the following steps:
 
-1. **Next.js + Apache**: test whether a static Next.js build can be deployed to the Apache document root. If server-side Next.js is required, verify whether Node.js is supported.
-2. **Streamlit + Git**: use the existing `Git Clone` / `Git Pull` / `Start Streamlit` custom commands to test the remote Git deployment mechanism.
+1. Install curl in the GitLab runner.
+2. Establish an initial Webmin session and save the cookies.
+3. Authenticate against the Webmin login endpoint.
+4. Store the authenticated Webmin session cookie.
+5. Call the Webmin Custom Command responsible for the Git Pull.
+6. Webmin pulls the latest repository changes into the Streamlit deployment directory.
 
-## Current known result
+The Webmin command currently uses:
 
-The `nextjs-test` Webapplication Farm instance was created successfully and a manually uploaded `index.html` was served successfully at the instance URL.
+POST /custom/run.cgi
 
-That proves basic Apache/static-file hosting works.
+id=1691656868
+directory=streamlit-webapp-test
 
-## Next.js demo
+Credentials
+-----------
+The Webmin credentials are NOT stored in this repository.
 
-The `nextjs/` application is configured for a static export.
+The pipeline expects the following GitLab CI/CD variables:
 
-Build locally:
+WEBMIN_USER
+WEBMIN_PASSWORD
 
-    cd nextjs
-    npm install
-    npm run build
+These values are configured in the GitLab project settings and are injected into the CI job at runtime.
 
-The generated `out/` directory is the deployable static website.
+The credentials should never be committed to .gitlab-ci.yml or any other repository file.
 
-Copy the **contents** of `out/` into the Webapplication Farm document root and verify the instance URL.
+Current Result
+--------------
+The CI/CD workflow has been successfully tested:
 
-This is the safest first Next.js test because Apache can serve the generated HTML/JS/CSS without requiring a Node.js process.
+GitLab CI
+   |
+   v
+Webmin authentication
+   |
+   v
+Authenticated Webmin session
+   |
+   v
+Webmin Git Pull command
+   |
+   v
+Latest repository changes pulled
+   |
+   v
+Streamlit deployment updated
 
-## Streamlit demo
+A change pushed to the repository was successfully pulled by Webmin through the GitLab CI pipeline.
 
-The `streamlit/` application is intentionally minimal.
+Open Infrastructure Questions
+------------------------------
+The current implementation is a proof of concept and uses a Webmin account through GitLab CI/CD variables.
 
-The Webmin screenshot shows custom commands for:
+Before using this approach for production deployment, the Web Application Farm/Webmin administrators need to clarify:
 
-- Git Clone
-- Git Pull
-- Start Streamlit
-- Stop Streamlit
+- Can a dedicated CI/CD or service account be created for automated deployments?
+- What permissions would this account require?
+- Can its permissions be restricted to the required deployment command?
+- Is there an officially supported Webmin API or authentication mechanism for CI/CD?
+- How should the credentials for automated deployment be managed securely?
 
-For the Streamlit test:
+Using a personal Webmin account is only intended for the current technical test and should not be considered the final deployment setup.
 
-1. Use `Git Clone` with the URL of this repository (or your company's Git repository).
-2. Use `Git Pull` after changing the application.
-3. Use the existing `Start Streamlit` command.
-4. Confirm that the updated application is reachable.
-5. Record whether any manual permission/configuration step is required.
+Current Status
+-------------
+Completed:
+- Streamlit application deployed on the Web Application Farm.
+- GitLab repository and CI/CD pipeline configured.
+- Webmin authentication from GitLab CI successfully tested.
+- Webmin Git Pull custom command successfully triggered from GitLab CI.
+- Repository changes successfully pulled into the Streamlit deployment.
 
-Do not put credentials or tokens in this repository.
+Pending:
+- Define the appropriate Webmin CI/CD/service account.
+- Confirm the required Webmin permissions.
+- Agree on the final credential-management approach.
+- Confirm the final deployment/restart mechanism for the Streamlit application.
 
-## CI/CD investigation
+Purpose of the Demo
+-------------------
+This repository is intended for discussion with the infrastructure/Webmin administrators.
 
-The repository includes `.gitlab-ci.example.yml` as a discussion template only. It is deliberately not a ready-to-run deployment because the actual approved deployment method and credentials for the Webapplication Farm are infrastructure-specific.
+It demonstrates that remote CI/CD deployment is technically possible with the currently available Webmin functionality.
 
-The infrastructure team needs to confirm whether CI is allowed to use SSH/SFTP, a deployment account, or another approved mechanism.
-
-## Questions / blockers to record
-
-- Can CI authenticate to the Webapplication Farm without manual account/file changes?
-- Is SSH/SFTP available for the instance?
-- Can the CI account write to the document root?
-- Is there an approved service account?
-- Can the instance run Node.js?
-- Is a reverse proxy available if server-side Next.js is required?
-- Can Git Clone/Pull be executed non-interactively?
-- Does the Webmin custom-command mechanism support automated Git pulls?
-- Does deployment require manual administrator intervention?
-
-## Suggested acceptance criteria
-
-### Apache / Next.js
-
-- [ ] Next.js Hello World builds successfully.
-- [ ] Static output can be deployed to the Apache document root.
-- [ ] The application is reachable through the Webapplication Farm URL.
-- [ ] A Git/CI mechanism can update the deployed files.
-- [ ] No manual permission-file modification is required for each deployment.
-
-### Streamlit
-
-- [ ] Repository can be cloned using the provided custom command.
-- [ ] Streamlit application starts using the provided command.
-- [ ] A Git change can be pulled remotely.
-- [ ] The running application can be updated/restarted.
-- [ ] Required permissions can be provided without ad-hoc manual changes.
-
-## Discussion
-
-This repository is intended as a small, reproducible proof of concept. Keep infrastructure-specific credentials, hostnames, and deployment secrets outside Git.
+The remaining issue is primarily the proper authentication and authorization model for automated deployments, rather than the basic GitLab-to-Webmin deployment workflow.
