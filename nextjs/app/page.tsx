@@ -1,8 +1,32 @@
-export default function Home() {
+import { auth, signIn } from "../auth";
+import Link from "next/link";
+
+export default async function HomePage() {
+  const session = await auth();
+
+  if (session) {
+    return (
+      <main>
+        <h1>FH Platform Demo</h1>
+        <p>You are signed in as {session.user?.email ?? "an authenticated user"}.</p>
+        <Link href="/dashboard">Open dashboard</Link>
+      </main>
+    );
+  }
+
   return (
-    <main style={{ fontFamily: "sans-serif", padding: "3rem" }}>
-      <h1>Hello World</h1>
-      <p>Next.js static export deployed to the Webapplication Farm.</p>
+    <main>
+      <h1>FH Platform Demo</h1>
+      <p>Sign in with your Keycloak account to access the platform.</p>
+
+      <form
+        action={async () => {
+          "use server";
+          await signIn("keycloak", { redirectTo: "/dashboard" });
+        }}
+      >
+        <button type="submit">Sign in with Keycloak</button>
+      </form>
     </main>
   );
 }
