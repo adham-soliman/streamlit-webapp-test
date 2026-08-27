@@ -1,5 +1,6 @@
 import { auth, signOut } from "../../auth";
 import { redirect } from "next/navigation";
+import { LogoutButton } from "./logout-button";
 
 type SessionWithRoles = {
   user?: {
@@ -76,14 +77,7 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/" });
-        }}
-      >
-        <button type="submit">Sign out</button>
-      </form>
+      <LogoutButton />
     </main>
   );
 }

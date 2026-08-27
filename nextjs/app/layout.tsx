@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Webapplication Farm Next.js Demo",
-  description: "Hello World proof of concept"
+  title: "FH Platform – Access Rights Demo",
+  description: "Local Next.js, Auth.js, and Keycloak authentication demo",
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
