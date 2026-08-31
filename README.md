@@ -1,3 +1,8 @@
+<img width="1569" height="828" alt="Screenshot 2026-08-31 141540" src="https://github.com/user-attachments/assets/4521d793-84e6-45f8-ba70-4f55a9b72ef6" />
+<img width="1702" height="870" alt="Screenshot 2026-08-31 141551" src="https://github.com/user-attachments/assets/ec49aa12-c657-459a-af68-061ba2b7608f" />
+<img width="1768" height="948" alt="Screenshot 2026-08-31 141315" src="https://github.com/user-attachments/assets/3b07f0e7-3e11-433b-8a6f-29cd2ecbb9f7" />
+<img width="1657" height="933" alt="Screenshot 2026-08-31 141447" src="https://github.com/user-attachments/assets/aeea5e24-04bd-44fc-9bfb-4037308bb4a8" />
+<img width="1737" height="915" alt="Screenshot 2026-08-31 141700" src="https://github.com/user-attachments/assets/aacb46e2-9869-4c3a-8750-2d57723fe04b" />
 GitLab Repository:
 https://git01.iis.fhg.de/soliman/streamlit-webapp-test/-/tree/b639ab2e419f494af28e552667b235be97f34120/
 
